@@ -17,6 +17,7 @@
 }(function ($) {
   'use strict';
   var namespace = 'animsition';
+  var loadComplete = false;
   var methods = {
     init: function(options){
       options = $.extend({
@@ -34,7 +35,8 @@
                                   '-o-animation-duration'],
         overlay               :   false,
         overlayClass          :   'animsition-overlay-slide',
-        overlayParentElement  :   'body'
+        overlayParentElement  :   'body',
+        timeOut               :   false
       }, options);
 
       // Remove the "Animsition" in a browser
@@ -81,8 +83,14 @@
           });
 
           $window.on('load.' + namespace + ' pageshow.' + namespace, function() {
-            methods.pageIn.call( _this );
+            if( loadComplete == false ) { methods.pageIn.call( _this ); }
           });
+          
+          if( options.timeOut && !isNaN( options.timeOut ) ) {
+            var t = setTimeout( function(){
+              if( loadComplete == false ) { methods.pageIn.call( _this ); }
+            }, options.timeOut );
+          }
 
           // Firefox back button issue #4
           $window.on('unload.' + namespace, function() { });
@@ -189,6 +197,7 @@
       } else {
         methods.pageInBasic.call(_this,inClass,inDuration);
       }
+      loadComplete = true;
     },
 
     pageInBasic: function(inClass,inDuration){
